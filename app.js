@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // app.use((req, res, next) => {
@@ -18,20 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //app.get() is a method that allows us to register a new middleware for incoming GET requests
 //app.post() is a method that allows us to register a new middleware for incoming POST requests
 
-app.use('/add-product', (req, res, next) => {
-  res.send(
-    "<form action='/product' method='POST'> <input type='text' name='title'><button type='submit'>Add Product</button> </form>"
-  );
-});
-
-app.post('/product', (req, res, next) => {
-  console.log(req.body);
-  console.log('This is product!');
-  res.redirect('/');
-});
-
-app.use('/', (req, res, next) => {
-  res.send('<h1>Hello from Express!</h1>');
-});
+app.use(adminRoutes); //order matters
+app.use(shopRoutes);
 
 app.listen(3000);
