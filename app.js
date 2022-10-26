@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //app.get() is a method that allows us to register a new middleware for incoming GET requests
 //app.post() is a method that allows us to register a new middleware for incoming POST requests
 
-app.use(adminRoutes); //order matters
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use((req, res, next) => {
