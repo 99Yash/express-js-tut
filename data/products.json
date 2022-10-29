@@ -1,6 +1,7 @@
 [
   {
     "title": "A Book",
+    "id": "1",
     "imageUrl": "https://imgs.search.brave.com/i1NyUvW5OCLgwPq8obW9rud0ISQD-snXVLt92sH2XQE/rs:fit:1200:1200:1/g:ce/aHR0cHM6Ly9jb250/ZW50Lmluc3RydWN0/YWJsZXMuY29tL09S/SUcvRjNZL0pINjUv/SVI5RThLVFIvRjNZ/Skg2NUlSOUU4S1RS/LmpwZz9mcmFtZT0x/JndpZHRoPTIxMDA",
     "description": "This is an awesome book!",
     "price": "19"
