@@ -17,7 +17,7 @@ module.exports = class Cart {
       }
       // Analyze the cart => Find existing product
       const existingProductIndex = cart.products.findIndex(
-        (prod) => prod.id === id
+        prod => prod.id === id
       );
       const existingProduct = cart.products[existingProductIndex];
       let updatedProduct;
@@ -31,11 +31,8 @@ module.exports = class Cart {
         updatedProduct = { id: id, qty: 1 };
         cart.products = [...cart.products, updatedProduct];
       }
-      // Add the new/updated cart to the session
-      //+productPrice refers to the str=>number value of the price
       cart.totalPrice = cart.totalPrice + +productPrice;
-      // Write the cart to the file
-      fs.writeFile(p, JSON.stringify(cart), (err) => {
+      fs.writeFile(p, JSON.stringify(cart), err => {
         console.log(err);
       });
     });
@@ -47,17 +44,18 @@ module.exports = class Cart {
         return;
       }
       const updatedCart = { ...JSON.parse(fileContent) };
-      const product = updatedCart.products.find((prod) => prod.id === id);
+      const product = updatedCart.products.find(prod => prod.id === id);
       if (!product) {
-        return;
+          return;
       }
       const productQty = product.qty;
       updatedCart.products = updatedCart.products.filter(
-        (prod) => prod.id !== id
+        prod => prod.id !== id
       );
       updatedCart.totalPrice =
         updatedCart.totalPrice - productPrice * productQty;
-      fs.writeFile(p, JSON.stringify(updatedCart), (err) => {
+
+      fs.writeFile(p, JSON.stringify(updatedCart), err => {
         console.log(err);
       });
     });
