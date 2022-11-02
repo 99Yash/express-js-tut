@@ -10,6 +10,8 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+const sequelize = require('./util/database');
+
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
@@ -21,4 +23,12 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
+sequelize
+  .sync()
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 app.listen(3000);
