@@ -83,6 +83,42 @@ class User {
       );
   }
 
+  addOrder() {
+    //no need to use the cart items because we already have them in the database
+
+    const db = getDb();
+    return this.getCart()
+      .then((products) => {
+        const order = {
+          items: products,
+          user: {
+            _id: new ObjectId(this._id),
+            name: this.name,
+          },
+        };
+        return db.collection('orders').insertOne(this.cart);
+      })
+      .then((res) => {
+        //clear the cart
+        this.cart = { items: [] };
+        //update the database
+        return db
+          .collection('users')
+          .updateOne(
+            { _id: new ObjectId(this._id) },
+            { $set: { cart: { items: [] } } }
+          );
+      });
+  }
+
+  getOrders() {
+    const db = getDb();
+    return db
+      .collection('orders')
+      .find({ 'user._id': new ObjectId(this._id) })
+      .toArray();
+  }
+
   static findById(userId) {
     const db = getDb();
     return db
