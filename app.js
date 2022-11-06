@@ -8,6 +8,7 @@ const Product = require('./models/product');
 const User = require('./models/user');
 
 const app = express();
+const mongoose = require('mongoose');
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -33,6 +34,13 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(() => {
-  app.listen(3000);
-});
+mongoose
+  .connect(
+    'mongodb+srv://99Yash:txjcv8805@cluster0.jerkvnb.mongodb.net/shop?retryWrites=true&w=majority'
+  )
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
