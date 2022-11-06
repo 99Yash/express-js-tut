@@ -49,7 +49,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.user
+  req.session.user
     .populate('cart.items.productId') //populate doesnt return a promise, it returns the user object with the populated cart so we have to call execPopulate() to return a promise
     .execPopulate()
     .then((products) => {
@@ -57,6 +57,7 @@ exports.getCart = (req, res, next) => {
         path: '/cart',
         pageTitle: 'Your Cart',
         products: products,
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -65,14 +66,14 @@ exports.getCart = (req, res, next) => {
     const prodId = req.body.productId;
     Product.findById(prodId)
       .then((product) => {
-        return req.user.addToCart(product);
+        return req.session.user.addToCart(product);
         res.redirect('/cart');
       })
       .catch((err) => console.log(err));
   };
   // let fetchedCart;
   // let newQuantity = 1;
-  // req.user
+  // req.session.user
   //   .getCart()
   //   .then((cart) => {
   //     fetchedCart = cart;
@@ -98,7 +99,7 @@ exports.getCart = (req, res, next) => {
 
   exports.postCartDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    req.user
+    req.session.user
       .deleteItemFromCart(prodId)
       .then((result) => {
         res.redirect('/cart');
@@ -107,7 +108,7 @@ exports.getCart = (req, res, next) => {
   };
 
   exports.postOrder = (req, res, next) => {
-    req.user
+    req.session.user
       .populate('cart.items.productId') //populate doesnt return a promise, it returns the user object with the populated cart so we have to call execPopulate() to return a promise
       .execPopulate()
       .then((products) => {
@@ -116,8 +117,8 @@ exports.getCart = (req, res, next) => {
         });
         const order = new Order({
           user: {
-            name: req.user.name,
-            userId: req.user, //mongoose will automatically extract the id from this
+            name: req.session.user.name,
+            userId: req.session.user, //mongoose will automatically extract the id from this
           },
           products: products,
         });
@@ -125,7 +126,7 @@ exports.getCart = (req, res, next) => {
       })
 
       .then((result) => {
-        return req.user.clearCart();
+        return req.session.user.clearCart();
       })
       .then(() => {
         res.redirect('/orders');
@@ -134,12 +135,13 @@ exports.getCart = (req, res, next) => {
   };
 
   exports.getOrders = (req, res, next) => {
-    Order.find({ 'user.userId': req.user._id })
+    Order.find({ 'user.userId': req.session.user._id })
       .then((orders) => {
         res.render('shop/orders', {
           path: '/orders',
           pageTitle: 'Your Orders',
           orders: orders,
+          isAuthenticated: req.session.isLoggedIn,
         });
       })
       .catch((err) => console.log(err));
