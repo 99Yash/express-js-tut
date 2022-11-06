@@ -22,6 +22,7 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     description: description,
     imageUrl: imageUrl,
+    userId: req.user, //mongoose will automatically extract the id from this object
   });
   product
     .save() //save is a method of  mongoose
@@ -81,6 +82,8 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    // .select('title price -_id') // minus sign means exclude
+    // .populate('userId', 'name')
     .then((products) => {
       res.render('admin/products', {
         prods: products,

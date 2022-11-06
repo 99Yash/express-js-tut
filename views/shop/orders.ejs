@@ -7,26 +7,24 @@
             <% if (orders.length <= 0)` { %>
                 <h1>No orders found</h1>
             <% } else { %>
-                <h1>Orders</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Order Date</th>
-                            <th>Order Total</th>
-                            <th>Order Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for (let order of orders) { %>
-                            <tr>
-                                <td><%= order._id %></td>
-                                <td><%= order.order_date %></td>
-                                <td><%= order.order_total %></td>
-                                <td><%= order.order_status %></td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-        </main>
+                <ul class="orders">
+                    <% orders.forEach(order => { %>
+                        <li>
+                            <h2>Order #<%= order._id %></h2>
+                            <p>Order placed on <%= order.date %></p>
+                            <p>Order total: $<%= order.total %></p>
+                            <p>Order status: <%= order.status %></p>
+                            <p>Order items:</p>
+                            <ul>
+                                <% order.products.forEach(product => { %>
+                                    <li>
+                                        <p><%= product.product.title %></p>
+                                        <p>Quantity: <%= product..product.quantity %></p>
+                                        <p>Price: $<%= product..product.price %></p>
+                                    </li>
+                                <% }) %>
+                            </ul>
+                        </li>
+                    <% }) %>
+                </ul>
         <%- include('../includes/end.ejs') %>
