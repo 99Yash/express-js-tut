@@ -7,8 +7,19 @@ const errorController = require('./controllers/error');
 const Product = require('./models/product');
 const User = require('./models/user');
 
-const app = express();
+const MONGODB_URI =
+  'mongodb+srv://99Yash:txjcv8805@cluster0.jerkvnb.mongodb.net/shop?&w=majority';
+
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session); //pass session from the session package as an argument to the function returned by require('connect-mongodb-session')
+
+const app = express();
+const store = new MongoDBStore({
+  //store is a new instance of MongoDBStore that saves the session in the database
+  uri: MONGODB_URI,
+  collection: 'sessions', //value name is upto you
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -19,16 +30,14 @@ const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use((req, res, next) => {
-  //!problem
-  User.findById(1)
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-});
+app.use(
+  session({
+    secret: 'my secret',
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
+);
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -37,9 +46,7 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect(
-    'mongodb+srv://99Yash:txjcv8805@cluster0.jerkvnb.mongodb.net/shop?retryWrites=true&w=majority'
-  )
+  .connect(MONGODB_URI)
   .then((result) => {
     User.findOne().then((user) => {
       if (!user) {
