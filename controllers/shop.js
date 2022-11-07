@@ -49,7 +49,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.session.user
+  req.user
     .populate('cart.items.productId') //populate doesnt return a promise, it returns the user object with the populated cart so we have to call execPopulate() to return a promise
     .execPopulate()
     .then((products) => {
@@ -66,14 +66,14 @@ exports.getCart = (req, res, next) => {
     const prodId = req.body.productId;
     Product.findById(prodId)
       .then((product) => {
-        return req.session.user.addToCart(product);
+        return req.user.addToCart(product);
         res.redirect('/cart');
       })
       .catch((err) => console.log(err));
   };
   // let fetchedCart;
   // let newQuantity = 1;
-  // req.session.user
+  // req.user
   //   .getCart()
   //   .then((cart) => {
   //     fetchedCart = cart;
@@ -99,7 +99,7 @@ exports.getCart = (req, res, next) => {
 
   exports.postCartDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    req.session.user
+    req.user
       .deleteItemFromCart(prodId)
       .then((result) => {
         res.redirect('/cart');
@@ -108,7 +108,7 @@ exports.getCart = (req, res, next) => {
   };
 
   exports.postOrder = (req, res, next) => {
-    req.session.user
+    req.user
       .populate('cart.items.productId') //populate doesnt return a promise, it returns the user object with the populated cart so we have to call execPopulate() to return a promise
       .execPopulate()
       .then((products) => {
@@ -117,8 +117,8 @@ exports.getCart = (req, res, next) => {
         });
         const order = new Order({
           user: {
-            name: req.session.user.name,
-            userId: req.session.user, //mongoose will automatically extract the id from this
+            name: req.user.name,
+            userId: req.user, //mongoose will automatically extract the id from this
           },
           products: products,
         });
@@ -126,7 +126,7 @@ exports.getCart = (req, res, next) => {
       })
 
       .then((result) => {
-        return req.session.user.clearCart();
+        return req.user.clearCart();
       })
       .then(() => {
         res.redirect('/orders');
@@ -135,7 +135,7 @@ exports.getCart = (req, res, next) => {
   };
 
   exports.getOrders = (req, res, next) => {
-    Order.find({ 'user.userId': req.session.user._id })
+    Order.find({ 'user.userId': req.user._id })
       .then((orders) => {
         res.render('shop/orders', {
           path: '/orders',

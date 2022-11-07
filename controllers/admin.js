@@ -23,7 +23,7 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     description: description,
     imageUrl: imageUrl,
-    userId: req.session.user, //mongoose will automatically extract the id from this object
+    userId: req.user, //mongoose will automatically extract the id from this object
   });
   product
     .save() //save is a method of  mongoose

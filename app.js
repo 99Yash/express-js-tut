@@ -39,6 +39,18 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  if (!req.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+    .then((user) => {
+      req.user = user; // this will add a user model to the request
+      next();
+    })
+    .catch((err) => console.log(err));
+});
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
