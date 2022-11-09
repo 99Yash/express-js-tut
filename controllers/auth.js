@@ -11,10 +11,31 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  req.session.isLoggedIn = true;
+  const email = req.body.email;
+  const password = req.body.password;
   // res.setHeader('Set-Cookie', 'loggedIn=true; HttpOnly; Max-Age=10;'); //*HttpOnly means that the cookie can only be accessed by the server, not the client
-  User.findById('5f9e1b0b0b9b9c1b3c8c1b1c')
+  User.findOne({ email: email })
     .then((user) => {
+      if (!user) {
+        return res.redirect('/login');
+      }
+      bcrypt
+        .compare(password, user.password)
+        .then((doMatch) => {
+          if (doMatch) {
+            req.session.isLoggedIn = true;
+            req.session.user = user;
+            return req.session.save((err) => {
+              console.log(err);
+              res.redirect('/');
+            });
+          }
+          res.redirect('/login');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
       req.session.user = user;
       req.session.isLoggedIn = true;
       req.session.save((err) => {
@@ -23,6 +44,7 @@ exports.postLogin = (req, res, next) => {
       });
     })
     .then((result) => {
+      req.session.isLoggedIn = true;
       res.redirect('/');
     });
 };
@@ -45,7 +67,7 @@ exports.postSignup = (req, res, next) => {
         //this means that the user already exists
         return res.redirect('/login');
       }
-      bcrypt.hash(password, 12).then((hashedPassword) => {
+      return bcrypt.hash(password, 12).then((hashedPassword) => {
         //create a new user
         const user = new User({
           email: email,
