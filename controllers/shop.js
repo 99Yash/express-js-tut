@@ -119,7 +119,7 @@ exports.getCart = (req, res, next) => {
         });
         const order = new Order({
           user: {
-            name: req.user.name,
+            email: req.user.email,
             userId: req.user, //mongoose will automatically extract the id from this
           },
           products: products,
