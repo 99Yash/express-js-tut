@@ -13,6 +13,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session); //pass session from the session package as an argument to the function returned by require('connect-mongodb-session')
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const app = express();
 const store = new MongoDBStore({
@@ -40,6 +41,8 @@ app.use(
   })
 );
 app.use(csrfProtection);
+app.use(flash());
+
 app.use((req, res, next) => {
   if (!req.user) {
     return next();
