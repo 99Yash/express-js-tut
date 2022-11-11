@@ -12,6 +12,7 @@
     "mongoose": "^6.7.1",
     "mysql2": "^2.3.3",
     "pug": "^3.0.2",
-    "sequelize": "^6.25.3"
+    "sequelize": "^6.25.3",
+    "transporter": "^0.0.1"
   }
 }
