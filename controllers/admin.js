@@ -14,9 +14,25 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
+  if (!image) {
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      hasError: true,
+      product: {
+        title: title,
+        price: price,
+        description: description,
+      },
+      errorMessage: 'Attached file is not an image.',
+      validationErrors: [],
+    });
+  }
+  //files are stored in the req.file object. they should be stored in the public folder, not the database, as they are too big.
 
   const errors = validationResult(req);
 
@@ -28,7 +44,6 @@ exports.postAddProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description,
       },
@@ -36,6 +51,9 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
+
+  const imageUrl = image.path; //this is the path to the image in my system
+
   const product = new Product({
     title: title,
     price: price,
@@ -58,7 +76,7 @@ exports.postAddProduct = (req, res, next) => {
       //     hasError: true,
       //     product: {
       //       title: title,
-      //       imageUrl: imageUrl,
+      //       image: image,
       //       price: price,
       //       description: description,
       //     },
@@ -105,7 +123,7 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
+  const image = req.file;
   const updatedDesc = req.body.description;
 
   const errors = validationResult(req);
@@ -118,7 +136,6 @@ exports.postEditProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: updatedTitle,
-        imageUrl: updatedImageUrl,
         price: updatedPrice,
         description: updatedDesc,
         _id: prodId,
@@ -137,8 +154,10 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
-
+      if (image) {
+        fileHelper.deleteFile(product.imageUrl);
+        product.imageUrl = image.path;
+      }
       return product.save().then((product) => {
         console.log('UPDATED PRODUCT!');
         res.redirect('/admin/products');

@@ -14,6 +14,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session); //pass session from the session package as an argument to the function returned by require('connect-mongodb-session')
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const app = express();
 const store = new MongoDBStore({
@@ -23,6 +24,25 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+  },
+});
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  }
+  cb(null, false); //file will be ignored
+};
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -31,6 +51,9 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
+); //single() is a method of multer that extracts the image from the request and stores it in the images folder
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
