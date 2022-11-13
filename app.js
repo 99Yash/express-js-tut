@@ -55,6 +55,7 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 ); //single() is a method of multer that extracts the image from the request and stores it in the images folder
 app.use(express.static(path.join(__dirname, 'public')));
+// app.use('/images', express.static(path.join(__dirname, 'images'))); //this is to make the images folder accessible to the browser. serving statically
 app.use(
   session({
     secret: 'my secret',
